@@ -96,9 +96,15 @@ trailers; mail goes to `MAIL_HOST`/`MAIL_PORT` (mailpit or any SMTP sink locally
 
 ## AI agents (Claude Code and friends)
 
-- **Check the CLIuno skills first**: `npx cliuno@latest skills status` — if any is
-  `missing`/`outdated`, run `npx cliuno@latest skills install` (adds `.claude/skills/cliuno-*`:
+These commands need **cliuno 2.2 or newer** (`npx cliuno@^2.2` fetches it).
+
+- **Check the CLIuno skills first**: `npx cliuno@^2.2 skills status` — if any is
+  `missing`/`outdated`, run `npx cliuno@^2.2 skills install` (adds `.claude/skills/cliuno-*`:
   the generator workflow, the scaffold guide, and the shared REST contract).
-- New resources follow "Adding a resource" above — copy the `todos` files, keep the
-  `{status, message, data}` envelope, `AuthUser` guard and `ensure_owns` checks.
-- Then run the gates above (fmt, clippy, test) and, for API-shaped changes, the matrix.
+- **Generate resources, don't hand-write them**:
+  `npx cliuno@^2.2 make:resource Product --fields name:string,price:number,inStock:boolean`
+  creates `src/models/product.rs`, `src/routes/products.rs`, `migrations/<timestamp>_create_products.sql`, `tests/products.rs` and registers it in `src/routes/mod.rs`, `src/models/mod.rs`, following this
+  template's conventions and the `{status, message, data}` contract. `--dry-run` previews,
+  re-running never duplicates registrations, `--force` overwrites.
+- Single pieces: `make:model`, `make:controller`, `make:migration`, `make:test`. `npx cliuno@^2.2 make` lists them.
+- Then edit fields/business logic only, and run the gates above.
