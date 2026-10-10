@@ -1,9 +1,18 @@
-# compiled output
-.vscode
+# build output
+target/
 
-# git
+# local state
+.env
+*.db
+*.db-shm
+*.db-wal
+uploads/*
+
+# git / editors
 .git/
 .gitignore
+.vscode/
+.idea/
 
 # docker
 Dockerfile

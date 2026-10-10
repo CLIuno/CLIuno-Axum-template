@@ -1,14 +1,31 @@
 [package]
-name = "cliuno-rocket-template"
+name = "cliuno-axum-template"
 version = "2.0.1"
-edition = "2021"
+edition = "2024"
+rust-version = "1.94"
 authors = ["RuM <cliuno.github.io>"]
-description = "A template for a Rocket web server with CLIUno"
-license = "APGL-3.0"
-repository = "https://github.com/CLIuno/CLIuno-Rocket-template"
+description = "CLIuno demo-app REST API (auth, users, todos, posts, follows, OTP, uploads) on Rust + Axum + SQLite"
+license = "AGPL-3.0-only"
+repository = "https://github.com/CLIuno/CLIuno-Axum-template"
+publish = false
 
 [dependencies]
-rocket = "0.5.1"
-okapi = "0.7.0"
-dotenv = "0.15.0"
-futures = "0.3"
+axum = { version = "0.8.9", features = ["multipart"] }
+bcrypt = "0.19.3"
+chrono = { version = "0.4.45", features = ["serde"] }
+dotenvy = "0.15.7"
+jsonwebtoken = { version = "11.1.0", default-features = false, features = ["rust_crypto"] }
+lettre = { version = "0.11.23", default-features = false, features = ["builder", "hostname", "smtp-transport", "tokio1"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = { version = "1.0.151", features = ["preserve_order"] }
+sqlx = { version = "0.9.0", default-features = false, features = ["chrono", "macros", "migrate", "runtime-tokio", "sqlite"] }
+tokio = { version = "1.53.2", features = ["fs", "macros", "net", "rt-multi-thread", "signal"] }
+totp-rs = { version = "6.0.0", features = ["gen_secret", "otpauth"] }
+tower-http = { version = "0.7.1", features = ["cors", "fs", "trace"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+uuid = { version = "1.28.0", features = ["v4"] }
+
+[dev-dependencies]
+http-body-util = "0.1.5"
+tower = { version = "0.5.3", features = ["util"] }
