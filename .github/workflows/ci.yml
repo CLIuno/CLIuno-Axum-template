@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Format
+        run: cargo fmt --check
+
+      - name: Lint
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Test
+        run: cargo test
+
+      - name: Build (release)
+        run: cargo build --release
+
+      # Fresh-clone rule: an empty database must register + log in with no seed step.
+      - name: Smoke test (register + login on an empty database)
+        run: |
+          PORT=4310 DATABASE_URL=sqlite://ci-smoke.db ./target/release/cliuno-axum-template > server.log 2>&1 &
+          for _ in $(seq 1 30); do curl -sf localhost:4310/ > /dev/null && break; sleep 0.5; done
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST localhost:4310/api/v1/auth/register \
+            -H "Content-Type: application/json" \
+            -d '{"username":"ci","first_name":"C","last_name":"I","email":"ci@t.io","phone":"1","password":"password123","password_confirmation":"password123"}')
+          echo "register HTTP $code"; test "$code" = "201"
+          curl -s -X POST localhost:4310/api/v1/auth/login -H "Content-Type: application/json" \
+            -d '{"usernameOrEmail":"ci","password":"password123"}' | grep -q '"token"' && echo "login OK"
